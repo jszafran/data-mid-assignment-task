@@ -1,3 +1,5 @@
+I've found this repo on GitHub and thought that solving it will be fun :-).
+
 # Assignment task for Data Engineer
 
 ## Introduction
