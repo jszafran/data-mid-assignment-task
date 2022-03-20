@@ -52,20 +52,6 @@ class S3DataSourceParser(BaseDataSourceParser):
             )
         ]
 
-    # def _parse_raw_event(self, raw_event) -> ArticleEvent:
-    #     attributes = json.loads(raw_event.get("ATTRIBUTES"))
-    #
-    #     return ArticleEvent(
-    #         article_id=attributes.get("id"),
-    #         user_id=raw_event.get("MD5(USER_ID)"),
-    #         event=raw_event.get("EVENT_NAME"),
-    #         date=datetime.datetime.strptime(
-    #             raw_event.get("TIMESTAMP")[:10], "%Y-%m-%d"
-    #         ).date(),
-    #         title=attributes.get("title"),
-    #         category=attributes.get("category"),
-    #     )
-
     def get_raw_events(self) -> List[Dict]:
         objects = self._get_objects()
         raw_events = [
