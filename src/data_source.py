@@ -1,29 +1,40 @@
+import abc
 import codecs
 import csv
-import datetime
-import json
+import pathlib
 from typing import Dict, List
 
 import boto3
 from botocore import UNSIGNED
 from botocore.config import Config
 
-from src.types import ArticleEvent, EventType
 
-S3_RESOURCE = boto3.resource("s3", config=Config(signature_version=UNSIGNED))
-CODEC_READER = codecs.getreader("utf-8-sig")
-RELEVANT_EVENTS = (
-    EventType.MY_NEWS_CARD_VIEWED,
-    EventType.TOP_NEWS_CARD_VIEWED,
-    EventType.ARTICLE_VIEWED,
-)
+class BaseDataSourceParser(abc.ABC):
+    @abc.abstractmethod
+    def get_raw_events(self) -> List[Dict]:
+        pass
 
 
-class DataSourceParser:
+class LocalFileDataSourceParser(BaseDataSourceParser):
+    def __init__(self, datasets_dir: pathlib.Path):
+        self.datasets_dir = datasets_dir
+
+    def get_raw_events(self) -> List[Dict]:
+        raw_events = []
+        for file_path in self.datasets_dir.iterdir():
+            with open(str(file_path.absolute()), "rt", encoding="utf-8-sig") as f:
+                for raw_event in csv.DictReader(f, delimiter="\t"):
+                    raw_events.append(raw_event)
+        return raw_events
+
+
+class S3DataSourceParser(BaseDataSourceParser):
     def __init__(
         self, s3_bucket: str = "upday-data-assignment", prefix: str = "lake/"
     ) -> None:
-        self.s3_bucket = S3_RESOURCE.Bucket(s3_bucket)
+        self.s3_bucket = boto3.resource(
+            "s3", config=Config(signature_version=UNSIGNED)
+        ).Bucket(s3_bucket)
         self.prefix = prefix
 
     def _get_objects(self):
@@ -36,24 +47,26 @@ class DataSourceParser:
     def _get_object_data(self, obj) -> List[Dict]:
         return [
             row
-            for row in csv.DictReader(CODEC_READER(obj.get()["Body"]), delimiter="\t")
+            for row in csv.DictReader(
+                codecs.getreader("utf-8-sig")(obj.get()["Body"]), delimiter="\t"
+            )
         ]
 
-    def _parse_raw_event(self, raw_event) -> ArticleEvent:
-        attributes = json.loads(raw_event.get("ATTRIBUTES"))
+    # def _parse_raw_event(self, raw_event) -> ArticleEvent:
+    #     attributes = json.loads(raw_event.get("ATTRIBUTES"))
+    #
+    #     return ArticleEvent(
+    #         article_id=attributes.get("id"),
+    #         user_id=raw_event.get("MD5(USER_ID)"),
+    #         event=raw_event.get("EVENT_NAME"),
+    #         date=datetime.datetime.strptime(
+    #             raw_event.get("TIMESTAMP")[:10], "%Y-%m-%d"
+    #         ).date(),
+    #         title=attributes.get("title"),
+    #         category=attributes.get("category"),
+    #     )
 
-        return ArticleEvent(
-            article_id=attributes.get("id"),
-            user_id=raw_event.get("MD5(USER_ID)"),
-            event=raw_event.get("EVENT_NAME"),
-            date=datetime.datetime.strptime(
-                raw_event.get("TIMESTAMP")[:10], "%Y-%m-%d"
-            ).date(),
-            title=attributes.get("title"),
-            category=attributes.get("category"),
-        )
-
-    def read_raw_events(self) -> List[Dict]:
+    def get_raw_events(self) -> List[Dict]:
         objects = self._get_objects()
         raw_events = [
             raw_event for obj in objects for raw_event in self._get_object_data(obj)
