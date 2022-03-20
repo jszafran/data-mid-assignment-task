@@ -54,6 +54,7 @@ class DBManager:
         self.session = sessionmaker(bind=engine)()
         metadata.drop_all(engine)
         metadata.create_all(engine)
+        print("Tables have been successfully recreated to empty state.")
 
     def load_report(
         self, report: Union[UserPerformanceReport, ArticlePerformanceReport]

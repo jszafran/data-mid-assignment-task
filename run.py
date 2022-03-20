@@ -1,20 +1,23 @@
-import psycopg2
-from time import sleep
+import pathlib
 
-sleep(10)
-try:
-    # Just some sample code.
-    with psycopg2.connect(user='user',
-                          password='password',
-                          host='postgres',
-                          database='database') as connection:
-        cursor = connection.cursor()
-        # Print PostgreSQL Connection properties
-        print(connection.get_dsn_parameters(), '\n')
-        
-        # Print PostgreSQL version
-        cursor.execute('SELECT version();')
-        record = cursor.fetchone()
-        print('You are connected to - ', record, '\n')
-except (Exception, psycopg2.Error) as error:
-    print('Error while connecting to PostgreSQL', error)
+from src.data_source import LocalFileDataSourceParser, S3DataSourceParser
+from src.db import DBManager
+from src.report_service import ReportService
+
+path = pathlib.Path(__file__).parent / "datasets"
+
+print("Fetching data started.")
+s3_ds = S3DataSourceParser()
+local_ds = LocalFileDataSourceParser(path)
+events = local_ds.get_raw_events()
+print("Fetching data done.")
+
+reports = ReportService(events).create_performance_reports()
+print("Article Performance Report & User Performance Report generated.")
+
+db_manager = DBManager("postgresql://user:password@postgres:5432/database")
+db_manager.load_report(reports.article_performance_report)
+db_manager.load_report(reports.user_performance_report)
+print("Article Performance Report & User Performance Report loaded to database.")
+
+print("Done!")
