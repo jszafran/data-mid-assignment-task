@@ -8,6 +8,8 @@ import boto3
 from botocore import UNSIGNED
 from botocore.config import Config
 
+ENCODING = "utf-8-sig"
+
 
 class BaseDataSourceParser(abc.ABC):
     @abc.abstractmethod
@@ -22,7 +24,7 @@ class LocalFileDataSourceParser(BaseDataSourceParser):
     def get_raw_events(self) -> List[Dict]:
         raw_events = []
         for file_path in self.datasets_dir.iterdir():
-            with open(str(file_path.absolute()), "rt", encoding="utf-8-sig") as f:
+            with open(str(file_path.absolute()), "rt", encoding=ENCODING) as f:
                 for raw_event in csv.DictReader(f, delimiter="\t"):
                     raw_events.append(raw_event)
         return raw_events
@@ -48,7 +50,7 @@ class S3DataSourceParser(BaseDataSourceParser):
         return [
             row
             for row in csv.DictReader(
-                codecs.getreader("utf-8-sig")(obj.get()["Body"]), delimiter="\t"
+                codecs.getreader(ENCODING)(obj.get()["Body"]), delimiter="\t"
             )
         ]
 
