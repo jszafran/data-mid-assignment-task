@@ -40,14 +40,14 @@ class UserArticleDailyStats:
     article_views: int = 0
 
 
-@dataclass
+@dataclass(frozen=True)
 class UserPerformanceRow:
     user_id: str
     date: datetime.date
     ctr: Optional[float] = 0.0
 
 
-@dataclass
+@dataclass(frozen=True)
 class ArticlePerformanceRow:
     article_id: str
     date: datetime.date
