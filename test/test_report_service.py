@@ -3,11 +3,11 @@ from unittest import TestCase
 
 from src.report_service import ReportService
 from src.types import (
+    ArticlePerformance,
     ArticlePerformanceReport,
-    ArticlePerformanceRow,
     ReportServiceResult,
+    UserPerformance,
     UserPerformanceReport,
-    UserPerformanceRow,
 )
 
 
@@ -56,13 +56,13 @@ class TestReportService(TestCase):
 
         # test article performance data
         expected_article_performance_rows = {
-            ArticlePerformanceRow(
+            ArticlePerformance(
                 "art1", datetime.date(2019, 2, 15), "Title1", "Cat1", 1, 1
             ),
-            ArticlePerformanceRow(
+            ArticlePerformance(
                 "art2", datetime.date(2019, 2, 15), "Title2", "Cat2", 2, 0
             ),
-            ArticlePerformanceRow(
+            ArticlePerformance(
                 "art2", datetime.date(2019, 2, 17), "Title2", "Cat2", 0, 1
             ),
         }
@@ -74,10 +74,10 @@ class TestReportService(TestCase):
 
         # test user performance data
         expected_user_performance_rows = {
-            UserPerformanceRow("user1", datetime.date(2019, 2, 15), 1.0),
-            UserPerformanceRow("user2", datetime.date(2019, 2, 15), 0.0),
-            UserPerformanceRow("user3", datetime.date(2019, 2, 15), 0.0),
-            UserPerformanceRow("user3", datetime.date(2019, 2, 17), None),
+            UserPerformance("user1", datetime.date(2019, 2, 15), 1.0),
+            UserPerformance("user2", datetime.date(2019, 2, 15), 0.0),
+            UserPerformance("user3", datetime.date(2019, 2, 15), 0.0),
+            UserPerformance("user3", datetime.date(2019, 2, 17), None),
         }
 
         self.assertEqual(

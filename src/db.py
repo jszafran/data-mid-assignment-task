@@ -14,10 +14,10 @@ from sqlalchemy import (
 from sqlalchemy.orm import mapper, sessionmaker
 
 from src.types import (
+    ArticlePerformance,
     ArticlePerformanceReport,
-    ArticlePerformanceRow,
+    UserPerformance,
     UserPerformanceReport,
-    UserPerformanceRow,
 )
 
 metadata = MetaData()
@@ -44,8 +44,9 @@ user_performance_table = Table(
     UniqueConstraint("user_id", "date", name="uix_user_id_date"),
 )
 
-mapper(ArticlePerformanceRow, article_performance_table)
-mapper(UserPerformanceRow, user_performance_table)
+
+mapper(ArticlePerformance, article_performance_table)
+mapper(UserPerformance, user_performance_table)
 
 
 class DBManager:

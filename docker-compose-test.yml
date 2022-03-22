@@ -1,15 +1,16 @@
 version: '3'
 services:
-   etl:
+   tests:
       build: .
       depends_on:
-         - postgres
+         - postgres_test
       links:
-         - postgres
-      command: 'python run.py'
+         - postgres_test
+      environment:
+         DB_CONNECTION_STRING: postgresql://user:password@postgres_test:5432/testdatabase
       volumes:
          - .:/app
-   postgres:
+   postgres_test:
       image: postgres:11
       restart: always
       ports:
@@ -17,4 +18,4 @@ services:
       environment:
          POSTGRES_USER: user
          POSTGRES_PASSWORD: password
-         POSTGRES_DB: database
+         POSTGRES_DB: testdatabase

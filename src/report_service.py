@@ -6,15 +6,15 @@ from typing import Dict, List
 from src.types import (
     Article,
     ArticleEvent,
+    ArticlePerformance,
     ArticlePerformancePK,
     ArticlePerformanceReport,
-    ArticlePerformanceRow,
     EventType,
     ReportServiceResult,
     Stats,
+    UserPerformance,
     UserPerformancePK,
     UserPerformanceReport,
-    UserPerformanceRow,
 )
 
 RELEVANT_EVENTS = (
@@ -64,7 +64,7 @@ class ReportService:
                 ctr = None
 
             user_performance_data.append(
-                UserPerformanceRow(
+                UserPerformance(
                     user_id=pk.user_id,
                     date=pk.date,
                     ctr=ctr,
@@ -82,7 +82,7 @@ class ReportService:
         for pk, stats in article_performance_stats.items():
             article = articles.get(pk.article_id)
             article_performance_report_data.append(
-                ArticlePerformanceRow(
+                ArticlePerformance(
                     article_id=pk.article_id,
                     date=pk.date,
                     article_title=article.title,

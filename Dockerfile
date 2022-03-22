@@ -9,5 +9,3 @@ WORKDIR /app
 
 # Install python packages
 RUN pip install --no-cache-dir -r /app/requirements.txt
-
-CMD ["python", "./run.py"]

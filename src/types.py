@@ -40,15 +40,15 @@ class UserArticleDailyStats:
     article_views: int = 0
 
 
-@dataclass(frozen=True)
-class UserPerformanceRow:
+@dataclass(unsafe_hash=True)
+class UserPerformance:
     user_id: str
     date: datetime.date
     ctr: Optional[float] = 0.0
 
 
-@dataclass(frozen=True)
-class ArticlePerformanceRow:
+@dataclass(unsafe_hash=True)
+class ArticlePerformance:
     article_id: str
     date: datetime.date
     article_title: str
@@ -59,12 +59,12 @@ class ArticlePerformanceRow:
 
 @dataclass
 class UserPerformanceReport:
-    data: List[UserPerformanceRow]
+    data: List[UserPerformance]
 
 
 @dataclass
 class ArticlePerformanceReport:
-    data: List[ArticlePerformanceRow]
+    data: List[ArticlePerformance]
 
 
 @dataclass
